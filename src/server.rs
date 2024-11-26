@@ -9,8 +9,7 @@ use tonic::transport::Server;
 use tonic::{Request, Response, Status};
 
 use numpy::{PyArray1, PyArrayMethods};
-use pyo3::prelude::*;
-use pyo3::ffi::c_str;
+use pyo3::{types::{IntoPyDict, PyAnyMethods}, PyResult, Python};
 
 use routeguide::route_guide_server::{RouteGuide, RouteGuideServer};
 use routeguide::{Feature, Point, Rectangle, RouteNote, RouteSummary};
@@ -188,7 +187,7 @@ fn calc_distance(p1: &Point, p2: &Point) -> i32 {
     const CORD_FACTOR: f64 = 1e7;
     const R: f64 = 6_371_000.0; // meters
 
-    some_fun();
+    let _ = some_fun();
 
     let lat1 = p1.latitude as f64 / CORD_FACTOR;
     let lat2 = p2.latitude as f64 / CORD_FACTOR;
@@ -212,10 +211,10 @@ fn calc_distance(p1: &Point, p2: &Point) -> i32 {
 fn some_fun() -> PyResult<()> {
     Python::with_gil(|py| {
         let np = py.import_bound("numpy")?;
-        let locals = [("np", np)].into()?;
+        let locals = [("np", np)].into_py_dict_bound(py);
 
         let pyarray = py
-            .eval(c_str!("np.absolute(np.array([-1, -2, -3], dtype='int32'))"), Some(&locals), None)?
+            .eval_bound("np.absolute(np.array([-1, -2, -3], dtype='int32'))", Some(&locals), None)?
             .downcast_into::<PyArray1<i32>>()?;
 
         let readonly = pyarray.readonly();
