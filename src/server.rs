@@ -1,15 +1,18 @@
 use std::collections::HashMap;
+use std::hash::{Hash, Hasher};
 use std::pin::Pin;
 use std::sync::Arc;
 use std::time::Instant;
-use std::hash::{Hasher, Hash};
 use tokio::sync::mpsc;
 use tokio_stream::{wrappers::ReceiverStream, Stream, StreamExt};
 use tonic::transport::Server;
 use tonic::{Request, Response, Status};
 
 use numpy::{PyArray1, PyArrayMethods};
-use pyo3::{types::{IntoPyDict, PyAnyMethods}, PyResult, Python};
+use pyo3::{
+    types::{IntoPyDict, PyAnyMethods},
+    PyResult, Python,
+};
 
 use routeguide::route_guide_server::{RouteGuide, RouteGuideServer};
 use routeguide::{Feature, Point, Rectangle, RouteNote, RouteSummary};
@@ -163,7 +166,6 @@ impl Hash for Point {
 
 impl Eq for Point {}
 
-
 fn in_range(point: &Point, rect: &Rectangle) -> bool {
     use std::cmp;
 
@@ -214,7 +216,11 @@ fn some_fun() -> PyResult<()> {
         let locals = [("np", np)].into_py_dict_bound(py);
 
         let pyarray = py
-            .eval_bound("np.absolute(np.array([-1, -2, -3], dtype='int32'))", Some(&locals), None)?
+            .eval_bound(
+                "np.absolute(np.array([-1, -2, -3], dtype='int32'))",
+                Some(&locals),
+                None,
+            )?
             .downcast_into::<PyArray1<i32>>()?;
 
         let readonly = pyarray.readonly();
