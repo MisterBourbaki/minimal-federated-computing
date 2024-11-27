@@ -1,14 +1,14 @@
 [package]
-name = "routeguide"
+name = "minimal-federated-computing"
 version = "0.2.0"
 edition = "2021"
 
 [[bin]]
-name = "routeguide-server"
+name = "mfc-server"
 path = "src/server.rs"
 
 [[bin]]
-name = "routeguide-client"
+name = "mfc-client"
 path = "src/client.rs"
 
 [dependencies]
@@ -24,6 +24,9 @@ rand = "0.8"
 
 pyo3 = { version = "0.22", features = ["auto-initialize"] }
 numpy = "0.22"
+component = "0.1.1"
+fmt = "0.1.0"
+clippy = "0.0.302"
 
 [build-dependencies]
 tonic-build = "*"
