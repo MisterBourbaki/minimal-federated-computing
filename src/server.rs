@@ -11,7 +11,7 @@ use tonic::{Request, Response, Status};
 use numpy::{PyArray1, PyArrayMethods};
 use pyo3::{
     types::{IntoPyDict, PyAnyMethods},
-    PyResult, Python,
+    PyResult, Python, ffi::c_str, PyErr
 };
 
 use routeguide::route_guide_server::{RouteGuide, RouteGuideServer};
@@ -143,6 +143,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("RouteGuideServer listening on: {}", addr);
 
+    let py_result = some_fun().unwrap();
+    println!("Some result: {:?}", py_result);
+
     let route_guide = RouteGuideService {
         features: Arc::new(data::load()),
     };
@@ -210,23 +213,27 @@ fn calc_distance(p1: &Point, p2: &Point) -> i32 {
     (R * c) as i32
 }
 
-fn some_fun() -> PyResult<()> {
+// fn some_fun() -> PyResult<()> {
+fn some_fun() -> Result<Vec<i32>, PyErr> {
     Python::with_gil(|py| {
-        let np = py.import_bound("numpy")?;
-        let locals = [("np", np)].into_py_dict_bound(py);
+        let np = py.import("numpy")?;
+        let locals = [("np", np)].into_py_dict(py)?;
 
         let pyarray = py
-            .eval_bound(
-                "np.absolute(np.array([-1, -2, -3], dtype='int32'))",
+            .eval(
+                c_str!("np.absolute(np.array([-1, -2, -3], dtype='int32'))"),
                 Some(&locals),
                 None,
             )?
-            .downcast_into::<PyArray1<i32>>()?;
+            // .downcast_into::<PyArray1<i32>>()?;
+            .extract::<Vec<i32>>()?;
 
-        let readonly = pyarray.readonly();
-        let slice = readonly.as_slice()?;
-        assert_eq!(slice, &[1, 2, 3]);
+        // let readonly = pyarray.readonly();
+        // let slice = readonly.as_slice()?;
+        // assert_eq!(slice, &[1, 2, 3]);
 
-        Ok(())
+        // Ok(())
+        Ok(pyarray)
+        // pyarray
     })
 }
