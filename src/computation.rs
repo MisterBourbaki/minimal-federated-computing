@@ -21,9 +21,7 @@ pub fn some_fun() -> Result<Vec<i32>, PyErr> {
     })
 }
 
-const NUM: usize = 3;
-
-pub fn get_random_numpy_vec(dim_vec: i32, num_vec: i32) -> Result<[Vec<f64>; NUM], PyErr> {
+pub fn get_random_numpy_vec(dim_vec: i32, num_vec: i32) -> Result<Vec<Vec<f64>>, PyErr> {
     Python::with_gil(|py| {
         let np = py.import("numpy")?;
         let dim = dim_vec.into_pyobject(py).unwrap();
@@ -39,7 +37,7 @@ pub fn get_random_numpy_vec(dim_vec: i32, num_vec: i32) -> Result<[Vec<f64>; NUM
                 Some(&globals),
                 Some(&locals),
             )?
-            .extract::<[Vec<f64>; NUM]>()?;
+            .extract::<Vec<Vec<f64>> >()?;
 
         Ok(pyarray)
         // pyarray
