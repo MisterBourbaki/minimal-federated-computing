@@ -18,7 +18,7 @@ source .venv/bin/activate
 
 Please note that the python interpreter and the virtual env have to be findable by PyO3.
 
-Then run 
+Then run
 
 ```bash
 (.venv) cargo run --bin mfc-server
