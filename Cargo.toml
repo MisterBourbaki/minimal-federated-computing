@@ -35,3 +35,8 @@ clippy = "0.0.302"
 [build-dependencies]
 tonic-build = "*"
 
+# The profile that 'dist' will build with
+[profile.dist]
+inherits = "release"
+lto = "thin"
+
