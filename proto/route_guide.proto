@@ -26,6 +26,8 @@ service RouteGuide {
   // position.
   rpc GetFeature(Point) returns (Feature) {}
 
+  rpc GetVectors(SomeDims) returns (NumpyListVectors) {}
+
   // A server-to-client streaming RPC.
   //
   // Obtains the Features available within the given Rectangle.  Results are
@@ -105,7 +107,16 @@ message RouteSummary {
   int32 elapsed_time = 4;
 }
 
-message NumpyVectors {
+message SomeDims {
+  int32 dim = 1;
+  int32 num = 2;
+}
+
+message NumpyVector {
   string name = 1;
-  repeated float weights = 2;
+  repeated float weight = 2;
+}
+
+message NumpyListVectors {
+  repeated NumpyVector list_weights = 1;
 }
