@@ -14,10 +14,6 @@
 
 syntax = "proto3";
 
-option java_multiple_files = true;
-option java_package = "io.grpc.examples.routeguide";
-option java_outer_classname = "RouteGuideProto";
-
 package routeguide;
 
 // Interface exported by the server.
@@ -107,4 +103,9 @@ message RouteSummary {
 
   // The duration of the traversal in seconds.
   int32 elapsed_time = 4;
+}
+
+message NumpyVectors {
+  string name = 1;
+  repeated float weights = 2;
 }
