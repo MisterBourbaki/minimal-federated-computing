@@ -8,7 +8,7 @@ use tonic::transport::Channel;
 use tonic::Request;
 
 use routeguide::route_guide_client::RouteGuideClient;
-use routeguide::{Point, Rectangle, RouteNote};
+use routeguide::{Point, Rectangle, RouteNote, SomeDims};
 
 pub mod routeguide {
     tonic::include_proto!("routeguide");
@@ -101,6 +101,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }))
         .await?;
     println!("RESPONSE = {:?}", response);
+
+    let response_bis = client
+        .get_vectors(Request::new(SomeDims {
+            dim: 10,
+            num: 3,
+        }))
+        .await?;
+    println!("RESPONSE = {:?}", response_bis);
 
     println!("\n*** SERVER STREAMING ***");
     print_features(&mut client).await?;

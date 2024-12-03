@@ -1,5 +1,5 @@
 use pyo3::{
-    ffi::c_str, types::{IntoPyDict, PyAnyMethods}, IntoPyObjectExt, PyErr, Python
+    ffi::c_str, types::{IntoPyDict, PyAnyMethods}, PyErr, Python
 };
 use pyo3::prelude::*;
 
@@ -21,7 +21,9 @@ pub fn some_fun() -> Result<Vec<i32>, PyErr> {
     })
 }
 
-pub fn get_random_numpy_vec(dim_vec: i32, num_vec: i32) -> Result<Vec<Vec<f64>>, PyErr> {
+/// Returns a Vector of Vectors generated randomly through Numpy.
+/// Take as parameters the number num_vec of vectors, and the dimension dim_vec of those vectors.
+pub fn get_random_numpy_vec(dim_vec: i32, num_vec: i32) -> Result<Vec<Vec<f32>>, PyErr> {
     Python::with_gil(|py| {
         let np = py.import("numpy")?;
         let dim = dim_vec.into_pyobject(py).unwrap();
@@ -37,7 +39,7 @@ pub fn get_random_numpy_vec(dim_vec: i32, num_vec: i32) -> Result<Vec<Vec<f64>>,
                 Some(&globals),
                 Some(&locals),
             )?
-            .extract::<Vec<Vec<f64>> >()?;
+            .extract::<Vec<Vec<f32>> >()?;
 
         Ok(pyarray)
         // pyarray

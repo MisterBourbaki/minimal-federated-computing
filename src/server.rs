@@ -3,13 +3,14 @@ use std::hash::{Hash, Hasher};
 use std::pin::Pin;
 use std::sync::Arc;
 use std::time::Instant;
+use computation::get_random_numpy_vec;
 use tokio::sync::mpsc;
 use tokio_stream::{wrappers::ReceiverStream, Stream, StreamExt};
 use tonic::transport::Server;
 use tonic::{Request, Response, Status};
 
 use routeguide::route_guide_server::{RouteGuide, RouteGuideServer};
-use routeguide::{Feature, Point, Rectangle, RouteNote, RouteSummary};
+use routeguide::{Feature, Point, Rectangle, RouteNote, RouteSummary, SomeDims, NumpyVector, NumpyListVectors};
 
 pub mod routeguide {
     tonic::include_proto!("routeguide");
@@ -35,6 +36,16 @@ impl RouteGuide for RouteGuideService {
         }
 
         Ok(Response::new(Feature::default()))
+    }
+
+    async fn get_vectors(&self, request: Request<SomeDims>) -> Result<Response<NumpyListVectors>, Status> {
+        println!("GetFeature = {:?}", request);
+        let some_dims =request.get_ref();
+
+        let results = get_list_vectors(some_dims);
+        println!("Some vectors {:?}", results);
+
+        Ok(Response::new(results))
     }
 
     type ListFeaturesStream = ReceiverStream<Result<Feature, Status>>;
@@ -210,3 +221,13 @@ fn calc_distance(p1: &Point, p2: &Point) -> i32 {
     (R * c) as i32
 }
 
+fn get_list_vectors(&some_dims: &SomeDims) -> NumpyListVectors {
+    let dim = some_dims.dim;
+    let num = some_dims.num;
+    let vectors = get_random_numpy_vec(dim, num).unwrap();
+    let mut list = vec![];
+    for vector in vectors {
+        list.push(NumpyVector {name: "vec".to_string(), weight: vector});
+    }
+    NumpyListVectors {list_weights: list}
+}
