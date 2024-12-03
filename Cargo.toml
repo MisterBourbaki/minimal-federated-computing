@@ -1,7 +1,11 @@
 [package]
 name = "minimal-federated-computing"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
+repository = "https://github.com/MisterBourbaki/minimal-federated-computing"
+readme = "README.md"
+description = "This is a minimal(ist) Federated computing framework"
+license = "MIT OR Apache-2.0"
 
 [[bin]]
 name = "mfc-server"
