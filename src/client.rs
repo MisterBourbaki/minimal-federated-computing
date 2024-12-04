@@ -10,9 +10,29 @@ use tonic::Request;
 use routeguide::route_guide_client::RouteGuideClient;
 use routeguide::{Point, Rectangle, RouteNote, SomeDims};
 
+use clap::Parser;
+
 pub mod routeguide {
     tonic::include_proto!("routeguide");
 }
+
+/// Simple structure for arguments of the client CLI.
+#[derive(Parser, Debug)]
+#[command(version, about, long_about = None)]
+struct Args {
+    /// Dimension of the vectors
+    #[arg(short, long)]
+    dim_vec: i32,
+
+    /// Number of vectors
+    #[arg(short, long, default_value_t = 1)]
+    num_vec: i32,
+
+    /// Adress of the server
+    #[arg(short, long, default_value_t=String::from("[::1]:10000"))]
+    addr: String,
+}
+
 
 async fn print_features(client: &mut RouteGuideClient<Channel>) -> Result<(), Box<dyn Error>> {
     let rectangle = Rectangle {
@@ -91,7 +111,9 @@ async fn run_route_chat(client: &mut RouteGuideClient<Channel>) -> Result<(), Bo
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut client = RouteGuideClient::connect("http://[::1]:10000").await?;
+    let args = Args::parse();
+    let full_addr = String::from("http://") + &args.addr;
+    let mut client = RouteGuideClient::connect(full_addr).await?;
 
     println!("*** SIMPLE RPC ***");
     let response = client
@@ -104,8 +126,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let response_bis = client
         .get_vectors(Request::new(SomeDims {
-            dim: 10,
-            num: 3,
+            dim: args.dim_vec,
+            num: args.num_vec,
         }))
         .await?;
     println!("RESPONSE = {:?}", response_bis);

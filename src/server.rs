@@ -12,6 +12,8 @@ use tonic::{Request, Response, Status};
 use routeguide::route_guide_server::{RouteGuide, RouteGuideServer};
 use routeguide::{Feature, Point, Rectangle, RouteNote, RouteSummary, SomeDims, NumpyVector, NumpyListVectors};
 
+use clap::Parser;
+
 pub mod routeguide {
     tonic::include_proto!("routeguide");
 }
@@ -22,6 +24,15 @@ mod computation;
 #[derive(Debug)]
 pub struct RouteGuideService {
     features: Arc<Vec<Feature>>,
+}
+
+/// Simple structure for arguments of the server CLI.
+#[derive(Parser, Debug)]
+#[command(version, about, long_about = None)]
+struct Args {
+    /// Adress for the server to listen to
+    #[arg(short, long, default_value_t=String::from("[::1]:10000"))]
+    addr: String,
 }
 
 #[tonic::async_trait]
@@ -145,7 +156,10 @@ impl RouteGuide for RouteGuideService {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let addr = "[::1]:10000".parse().unwrap();
+
+    let args = Args::parse();
+    // let addr = "[::1]:10000".parse().unwrap();
+    let addr = args.addr.parse().unwrap();
 
     println!("RouteGuideServer listening on: {}", addr);
 
