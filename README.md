@@ -24,8 +24,20 @@ Then run
 (.venv) cargo run --bin mfc-server
 ```
 
-to launch the server, and in another termianl window
+to launch the server, and in another terminal window
 
 ```bash
-(.venv) cargo run --bin mfc-client
+(.venv) cargo run --bin mfc-client -- --dim-vec 10
+```
+
+To change the address on which the server listen, use the `--addr` flag:
+
+```bash
+(.venv) cargo run --bin mfc-server -- --addr "127.0.0.1:10000"
+```
+
+and
+
+```bash
+(.venv) cargo run --bin mfc-client -- --dim-vec 10 -- --addr "127.0.0.1:10000"
 ```
